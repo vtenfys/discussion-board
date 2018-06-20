@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const greenlockExpress = require('greenlock-express');
 
 const Message = require('./model').Message;
 const db = require('./database');
@@ -50,7 +51,16 @@ async function main() {
     res.end();
   });
 
-  app.listen(3000, () => console.log('Discussion board server running on port 3000!'));
+  const server = greenlockExpress.create({
+    version: 'draft-11',
+    server: 'https://acme-v02.api.letsencrypt.org/directory',
+    email: 'david.j.b@vivaldi.net',
+    agreeTos: true,
+    approveDomains: ['www.davidjb.online'],
+    configDir: require('path').join(require('os').homedir(), 'acme', 'etc'),
+    app
+  });
+  server.listen(3000, 3443);
 }
 
 main();
