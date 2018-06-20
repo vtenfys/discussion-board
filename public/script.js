@@ -181,3 +181,5 @@ async function main() {
 
   handleLogin();
 }
+
+main();

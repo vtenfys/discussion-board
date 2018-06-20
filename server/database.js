@@ -13,8 +13,6 @@ const crypto = require('crypto');
 
 mongoose.connect('mongodb://localhost:27017/discussionboard');
 
-const db = mongoose.connection;
-
 const MessageSchema = new mongoose.Schema({ _id: Number, message: String, author: String, email: String, date: Number });
 const Message = mongoose.model('Message', MessageSchema);
 
@@ -31,8 +29,8 @@ UserSchema.pre('save', function (next) {
       if (err) return next(err);
       this.password = hash;
       next();
-    })
-  })
+    });
+  });
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -88,7 +86,7 @@ async function createSession(email, date) {
 
 async function createUser(data) {
   try {
-    const user = await User.create(data);
+    await User.create(data);
     const session = await createSession(data.email, Date.now());
     return { success: true, err: null, sessionId: session.sessionId };
   } catch (err) {
@@ -106,7 +104,6 @@ async function login(data) {
 
     session = await createSession(user.email, Date.now());
   } catch (err) {
-    console.log(err);
     return { success: false, err: -100 };
   }
 

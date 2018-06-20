@@ -53,7 +53,7 @@ class Message {
     this._author = author;
   }
   set date(date) {
-    if (!date instanceof Date) {
+    if (!(date instanceof Date)) {
       throw new TypeError('date must be a Date object');
     }
     this._date = date;
