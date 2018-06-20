@@ -1,0 +1,21 @@
+/* Bootstrap bug fixes */
+@media (min-width: 576px) {
+  .navbar-expand-lg > .container, .navbar-expand-lg > .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+.list-group-item-secondary {
+  z-index: 2;
+}
+/* End of Bootstrap bug fixes */
+
+#user-status {
+  color: #FFF;
+  font-weight: 500;
+}
+
+body.logged-in .hide-logged-in, body:not(.logged-in) .show-logged-in {
+  display: none;
+}
