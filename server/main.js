@@ -56,7 +56,7 @@ async function main() {
     server: 'https://acme-v02.api.letsencrypt.org/directory',
     email: 'david.j.b@vivaldi.net',
     agreeTos: true,
-    approveDomains: ['www.davidjb.online'],
+    approveDomains: ['discussion.davidjb.online'],
     configDir: require('path').join(require('os').homedir(), 'acme', 'etc'),
     app
   });
