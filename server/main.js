@@ -17,7 +17,7 @@ async function main() {
     const data = req.body;
     const dateNow = new Date(Date.now());
 
-    const message = new Message(data.message, data.author, dateNow);
+    const message = new Message(data.message, dateNow);
     await db.insertMessage(message.id, message.data, data.sessionId);
 
     res.json(await db.getMessages());

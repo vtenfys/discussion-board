@@ -1,8 +1,7 @@
 class Message {
-  constructor(message, author, date) {
+  constructor(message, date) {
     this._id = Message.nextId();
     this.message = message;
-    this.author = author;
     this.date = date;
   }
 
@@ -33,9 +32,6 @@ class Message {
   get message() {
     return this._message;
   }
-  get author() {
-    return this._author;
-  }
   get date() {
     return Date.parse(this._date);
   }
@@ -45,12 +41,6 @@ class Message {
       throw new TypeError('message must be a string');
     }
     this._message = message;
-  }
-  set author(author) {
-    if (typeof author !== 'string') {
-      throw new TypeError('author must be a string');
-    }
-    this._author = author;
   }
   set date(date) {
     if (!(date instanceof Date)) {

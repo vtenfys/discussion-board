@@ -1,6 +1,5 @@
 async function submitForm() {
   const message = $('#form-message').val();
-  const author = $('#form-author').val();
   const sessionId = localStorage.getItem('sessionId');
 
   $('#form-message').val('');
@@ -8,7 +7,7 @@ async function submitForm() {
   let messages = await fetch('/messages/new', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, author, sessionId })
+    body: JSON.stringify({ message, sessionId })
   });
 
   messages = await messages.json();
@@ -29,7 +28,7 @@ function displayMessages(messages) {
     const $messageGroup = $('<ul class="list-group mb-4"></li>');
 
     const $author = $('<li class="list-group-item list-group-item-secondary author"></li>');
-    $author.text(`At ${new Date(message.date).toLocaleString()}, ${message.author} (${message.username}) wrote:`);
+    $author.text(`At ${new Date(message.date).toLocaleString()}, ${message.username} wrote:`);
     $messageGroup.append($author);
 
     const $messageText = $('<li class="list-group-item"></li>');

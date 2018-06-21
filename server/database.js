@@ -47,7 +47,7 @@ const Session = mongoose.model('Session', SessionSchema);
 // Message functions
 
 async function insertMessage(id, data, sessionId) {
-  if (!(data.message && data.author && data.date)) {
+  if (!(data.message && data.date)) {
     return { success: false, err: -3 };
   }
   data._id = id;
