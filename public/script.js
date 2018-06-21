@@ -143,7 +143,7 @@ async function handleLogin() {
   loginStatus = await loginStatus.json();
 
   if (loginStatus.success === true) {
-    $('#user-status').text(loginStatus.username);
+    $('#user-status').text(`Logged in as: ${loginStatus.username}`);
     $('body').addClass('logged-in');
   } else {
     logout();
