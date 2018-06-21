@@ -3,7 +3,7 @@ async function submitForm() {
   const author = $('#form-author').val();
   const sessionId = localStorage.getItem('sessionId');
 
-  $('#form-message, #form-author').val('');
+  $('#form-message').val('');
 
   let messages = await fetch('/messages/new', {
     method: 'POST',
@@ -29,7 +29,7 @@ function displayMessages(messages) {
     const $messageGroup = $('<ul class="list-group mb-4"></li>');
 
     const $author = $('<li class="list-group-item list-group-item-secondary author"></li>');
-    $author.text(`At ${new Date(message.date).toLocaleString()}, ${message.author} (${message.email}) wrote:`);
+    $author.text(`At ${new Date(message.date).toLocaleString()}, ${message.author} (${message.username}) wrote:`);
     $messageGroup.append($author);
 
     const $messageText = $('<li class="list-group-item"></li>');
@@ -53,7 +53,7 @@ async function login() {
   }
   $loginForm.removeClass('was-validated');
 
-  const email = $('#login-email').val();
+  const username = $('#login-username').val();
   const password = $('#login-password').val();
 
   $('.login-alert').addClass('d-none');
@@ -62,7 +62,7 @@ async function login() {
   let result = await fetch('/users/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ username, password })
   });
 
   result = await result.json();
@@ -71,11 +71,11 @@ async function login() {
   if (result.success) {
     localStorage.setItem('sessionId', result.sessionId);
     $('#login-modal').modal('hide');
-    $('#login-email, #login-password').val('');
+    $('#login-username, #login-password').val('');
     handleLogin();
 
   } else if (result.err === -1) {
-    $('#invalid-email-warning').removeClass('d-none');
+    $('#invalid-username-warning').removeClass('d-none');
   } else if (result.err === -2) {
     $('#incorrect-password-warning').removeClass('d-none');
   } else {
@@ -91,7 +91,7 @@ async function signUp() {
   }
   $signUpForm.removeClass('was-validated');
 
-  const email = $('#sign-up-email').val();
+  const username = $('#sign-up-username').val();
   const password = $('#sign-up-password').val();
 
   $('.login-alert').addClass('d-none');
@@ -100,7 +100,7 @@ async function signUp() {
   let result = await fetch('/users/signUp', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ username, password })
   });
 
   result = await result.json();
@@ -109,11 +109,11 @@ async function signUp() {
   if (result.success) {
     localStorage.setItem('sessionId', result.sessionId);
     $('#sign-up-modal').modal('hide');
-    $('#sign-up-email, #sign-up-password').val('');
+    $('#sign-up-username, #sign-up-password').val('');
     handleLogin();
 
   } else if (result.err === -5) {
-    $('#existing-email-warning').removeClass('d-none');
+    $('#existing-username-warning').removeClass('d-none');
   } else {
     $('#sign-up-unknown-error').removeClass('d-none');
   }
@@ -144,7 +144,7 @@ async function handleLogin() {
   loginStatus = await loginStatus.json();
 
   if (loginStatus.success === true) {
-    $('#user-status').text(loginStatus.email);
+    $('#user-status').text(loginStatus.username);
     $('body').addClass('logged-in');
   } else {
     logout();
@@ -172,8 +172,8 @@ async function main() {
     if (e.which === 13) signUp();
   });
 
-  $('#login-modal').on('shown.bs.modal', () => $('#login-email').focus());
-  $('#sign-up-modal').on('shown.bs.modal', () => $('#sign-up-email').focus());
+  $('#login-modal').on('shown.bs.modal', () => $('#login-username').focus());
+  $('#sign-up-modal').on('shown.bs.modal', () => $('#sign-up-username').focus());
   $('#logout-button').click(logout);
 
   loadAndDisplayMessages();

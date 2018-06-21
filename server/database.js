@@ -3,21 +3,21 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
 // Error codes
-// -1: user email not found
+// -1: username not found
 // -2: incorrect password
 // -3: missing message data
 // -4: inavlid/expired session
-// -5: user email already exists
+// -5: username already exists
 // -6: not authenticated when attempting to create message
 // -100: unknown error
 
 mongoose.connect('mongodb://localhost:27017/discussionboard');
 
-const MessageSchema = new mongoose.Schema({ _id: Number, message: String, author: String, email: String, date: Number });
+const MessageSchema = new mongoose.Schema({ _id: Number, message: String, author: String, username: String, date: Number });
 const Message = mongoose.model('Message', MessageSchema);
 
 const UserSchema = new mongoose.Schema({
-  email: { type: String, unique: true, required: true, trim: true },
+  username: { type: String, unique: true, required: true, trim: true },
   password: { type: String, required: true }
 });
 
@@ -37,7 +37,7 @@ const User = mongoose.model('User', UserSchema);
 
 const SessionSchema = new mongoose.Schema({
   sessionId: { type: String, unique: true },
-  email: String,
+  username: String,
   date: Number,
   ip: String
 });
@@ -52,8 +52,8 @@ async function insertMessage(id, data, sessionId) {
   }
   data._id = id;
   try {
-    data.email = await authenticateUser(sessionId);
-    if (!data.email) return { success: false, err: -6 };
+    data.username = await authenticateUser(sessionId);
+    if (!data.username) return { success: false, err: -6 };
 
     await Message.create(data);
     return { success: true, err: null };
@@ -74,11 +74,11 @@ async function getLastId() {
 
 // User functions
 
-async function createSession(email, date) {
+async function createSession(username, date) {
   const randomString = crypto.randomBytes(32).toString('hex');
-  let sessionId = crypto.createHmac('sha256', JSON.stringify({ email, date, randomString }));
+  let sessionId = crypto.createHmac('sha256', JSON.stringify({ username, date, randomString }));
   sessionId = sessionId.digest('hex');
-  const data = { sessionId, email, date };
+  const data = { sessionId, username, date };
 
   await Session.create(data);
   return data;
@@ -87,7 +87,7 @@ async function createSession(email, date) {
 async function createUser(data) {
   try {
     await User.create(data);
-    const session = await createSession(data.email, Date.now());
+    const session = await createSession(data.username, Date.now());
     return { success: true, err: null, sessionId: session.sessionId };
   } catch (err) {
     if (err.code === 11000) return { success: false, err: -5 };
@@ -99,10 +99,10 @@ async function login(data) {
   let user;
   let session;
   try {
-    user = await User.findOne({ email: data.email });
+    user = await User.findOne({ username: data.username });
     if (!user) return { success: false, err: -1 };
 
-    session = await createSession(user.email, Date.now());
+    session = await createSession(user.username, Date.now());
   } catch (err) {
     return { success: false, err: -100 };
   }
@@ -128,7 +128,7 @@ async function authenticateUser(sessionId) {
   if (session) {
     session.date = Date.now();
     await session.save();
-    return session.email;
+    return session.username;
   }
 
   return false;
@@ -136,9 +136,9 @@ async function authenticateUser(sessionId) {
 
 async function getUserBySessionId(sessionId) {
   try {
-    const email = await authenticateUser(sessionId);
-    if (email) {
-      return { success: true, email };
+    const username = await authenticateUser(sessionId);
+    if (username) {
+      return { success: true, username };
     } else {
       return { success: false, err: -4 };
     }
