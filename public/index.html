@@ -139,6 +139,41 @@
       </div>
     </div>
 
+    <div class="modal fade" id="edit-message-modal" tabindex="-1" role="dialog"
+      aria-labelledby="edit-message-modal-label" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="edit-message-modal-label">Edit message</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info d-none login-alert" role="alert" id="updating-message-alert">
+              Updating your message&hellip;
+            </div>
+            <div class="alert alert-warning d-none login-alert" role="alert" id="not-authenticated-warning">
+              You&rsquo;re not authenticated; please sign in with the correct account.
+            </div>
+            <div class="alert alert-warning d-none login-alert" role="alert" id="edit-message-unknown-error">
+              An unknown error occured. Please try again later.
+            </div>
+            <form id="edit-message-form">
+              <div class="form-group">
+                <label for="updated-message" class="col-form-label">Updated message:</label>
+                <input type="text" class="form-control" id="updated-message" required />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="edit-message-form-submit">Update message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
       integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

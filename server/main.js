@@ -29,6 +29,11 @@ async function main() {
     res.end();
   });
 
+  app.post('/messages/edit', async (req, res) => {
+    res.json(await db.editMessage(req.body));
+    res.end();
+  });
+
   app.get('/messages/get', async (req, res) => {
     res.json(await db.getMessages());
     res.end();

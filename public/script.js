@@ -24,9 +24,51 @@ async function deleteMessage(id) {
   loadAndDisplayMessages();
 }
 
+async function editMessage(id, messageText) {
+  const $editForm = $('#edit-message-form');
+  if ($editForm[0].checkValidity() === false) {
+    $editForm.addClass('was-validated');
+    return;
+  }
+  $editForm.removeClass('was-validated');
+
+  $('.login-alert').addClass('d-none');
+  $('#updating-message-alert').removeClass('d-none');
+
+  let result = await fetch('/messages/edit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, messageText, sessionId: localStorage.getItem('sessionId') })
+  });
+
+  result = await result.json();
+  $('.login-alert').addClass('d-none');
+
+  if (result.success) {
+    $('#edit-message-modal').modal('hide');
+    $('#update-message').val('');
+    loadAndDisplayMessages();
+
+  } else if (result.err === -6) {
+    $('#not-authenticated-warning').removeClass('d-none');
+  } else {
+    $('#edit-message-unknown-error').removeClass('d-none');
+  }
+}
+
+function showEditModal(id, messageText) {
+  $('#edit-message-modal').modal('show');
+  $('#updated-message').val(messageText);
+  $('#edit-message-form-submit').off('click').click(() => editMessage(id));
+
+  $('#edit-message-modal').off('keypress').keypress((e) => {
+    if (e.which === 13) editMessage(id, $('#updated-message').val());
+  });
+}
+
 function updateMessageButtons() {
   for (const message of $('.message')) {
-    if ($(message).attr('data-username') === localStorage.getItem('username')){
+    if ($(message).attr('data-username') === localStorage.getItem('username')) {
       $(message).addClass('mine');
     } else {
       $(message).removeClass('mine');
@@ -56,6 +98,7 @@ function displayMessages(messages) {
                       <button class="btn btn-danger btn-sm delete-button"><i class="fas fa-trash"></i></button>
                     </div>`);
     $author.find('.delete-button').click(() => deleteMessage(message._id));
+    $author.find('.edit-button').click(() => showEditModal(message._id, message.message));
     $messageGroup.append($author);
 
     const $messageText = $('<li class="list-group-item"></li>');
@@ -191,22 +234,22 @@ async function main() {
     return false;
   });
 
-  $('#login-form-submit').click(() => {
-    login();
-  });
+  $('#edit-message-form').submit(() => false);
+
+  $('#login-form-submit').click(() => login());
   $('#login-modal').keypress((e) => {
     if (e.which === 13) login();
   });
 
-  $('#sign-up-form-submit').click(() => {
-    signUp();
-  });
+  $('#sign-up-form-submit').click(() => signUp());
   $('#sign-up-modal').keypress((e) => {
     if (e.which === 13) signUp();
   });
 
   $('#login-modal').on('shown.bs.modal', () => $('#login-username').focus());
   $('#sign-up-modal').on('shown.bs.modal', () => $('#sign-up-username').focus());
+  $('#edit-message-modal').on('shown.bs.modal', () => $('#updated-message').focus().select());
+
   $('#logout-button').click(logout);
 
   loadAndDisplayMessages();

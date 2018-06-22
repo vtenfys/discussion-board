@@ -8,7 +8,7 @@ const crypto = require('crypto');
 // -3: missing message data
 // -4: inavlid/expired session
 // -5: username already exists
-// -6: not authenticated when attempting to create message
+// -6: not authenticated
 // -100: unknown error
 
 mongoose.connect('mongodb://localhost:27017/discussionboard');
@@ -62,10 +62,22 @@ async function insertMessage(sessionId, data) {
 
 async function deleteMessage(data) {
   try {
-    await Message.deleteOne({
-      _id: data.id,
-      username: await authenticateUser(data.sessionId)
-    });
+    const username = await authenticateUser(data.sessionId);
+    if (!username) return { success: false, err: -6 };
+
+    await Message.deleteOne({ _id: data.id, username });
+  } catch (err) {
+    return { success: false, err: -100 };
+  }
+}
+
+async function editMessage(data) {
+  try {
+    const username = await authenticateUser(data.sessionId);
+    if (!username) return { success: false, err: -6 };
+
+    await Message.updateOne({ _id: data.id, username }, { $set: { message: data.messageText } });
+    return { success: true };
   } catch (err) {
     return { success: false, err: -100 };
   }
@@ -156,4 +168,5 @@ async function getUserBySessionId(sessionId) {
   }
 }
 
-module.exports = { insertMessage, deleteMessage, getMessages, getLastId, createUser, login, logout, getUserBySessionId };
+module.exports =
+  { insertMessage, deleteMessage, editMessage, getMessages, getLastId, createUser, login, logout, getUserBySessionId };
