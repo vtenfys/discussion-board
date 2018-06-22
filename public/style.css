@@ -19,3 +19,21 @@
 body.logged-in .hide-logged-in, body:not(.logged-in) .show-logged-in {
   display: none;
 }
+
+.message-buttons {
+  position: absolute;
+  top: 0.5rem;
+  right: 1.25rem;
+  width: 6rem;
+}
+.edit-button, .delete-button {
+  width: 3rem;
+}
+
+.message:not(.mine) .message-buttons {
+  display: none;
+}
+
+.message.mine .author {
+  padding-right: 9rem;
+}

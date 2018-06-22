@@ -14,6 +14,26 @@ async function submitForm() {
   displayMessages(messages);
 }
 
+async function deleteMessage(id) {
+  await fetch('/messages/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, sessionId: localStorage.getItem('sessionId') })
+  });
+
+  loadAndDisplayMessages();
+}
+
+function updateMessageButtons() {
+  for (const message of $('.message')) {
+    if ($(message).attr('data-username') === localStorage.getItem('username')){
+      $(message).addClass('mine');
+    } else {
+      $(message).removeClass('mine');
+    }
+  }
+}
+
 function displayMessages(messages) {
   const $messages = $('#messages');
 
@@ -25,10 +45,17 @@ function displayMessages(messages) {
   $messages.empty();
 
   for (const message of messages) {
-    const $messageGroup = $('<ul class="list-group mb-4"></li>');
+    const $messageGroup = $('<ul class="list-group mb-4 message"></li>');
+    $messageGroup.attr('data-username', message.username);
 
     const $author = $('<li class="list-group-item list-group-item-secondary author"></li>');
     $author.text(`At ${new Date(message.date).toLocaleString()}, ${message.username} wrote:`);
+
+    $author.append(`<div class="btn-group message-buttons">
+                      <button class="btn btn-primary btn-sm edit-button"><i class="fas fa-edit"></i></button>
+                      <button class="btn btn-danger btn-sm delete-button"><i class="fas fa-trash"></i></button>
+                    </div>`);
+    $author.find('.delete-button').click(() => deleteMessage(message._id));
     $messageGroup.append($author);
 
     const $messageText = $('<li class="list-group-item"></li>');
@@ -37,6 +64,8 @@ function displayMessages(messages) {
 
     $messages.prepend($messageGroup);
   }
+
+  updateMessageButtons();
 }
 
 async function loadAndDisplayMessages() {
@@ -126,8 +155,11 @@ async function logout() {
   });
 
   localStorage.removeItem('sessionId');
+  localStorage.removeItem('username');
+
   $('body').removeClass('logged-in');
   $('#user-status').text('Not logged in');
+  updateMessageButtons();
 }
 
 async function handleLogin() {
@@ -144,10 +176,12 @@ async function handleLogin() {
 
   if (loginStatus.success === true) {
     $('#user-status').text(`Logged in as: ${loginStatus.username}`);
+    localStorage.setItem('username', loginStatus.username);
+
     $('body').addClass('logged-in');
+    updateMessageButtons();
   } else {
     logout();
-    localStorage.removeItem('sessionId');
   }
 }
 

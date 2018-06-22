@@ -13,7 +13,7 @@ const crypto = require('crypto');
 
 mongoose.connect('mongodb://localhost:27017/discussionboard');
 
-const MessageSchema = new mongoose.Schema({ _id: Number, message: String, author: String, username: String, date: Number });
+const MessageSchema = new mongoose.Schema({ _id: Number, message: String, username: String, date: Number });
 const Message = mongoose.model('Message', MessageSchema);
 
 const UserSchema = new mongoose.Schema({
@@ -38,25 +38,34 @@ const User = mongoose.model('User', UserSchema);
 const SessionSchema = new mongoose.Schema({
   sessionId: { type: String, unique: true },
   username: String,
-  date: Number,
-  ip: String
+  date: Number
 });
 
 const Session = mongoose.model('Session', SessionSchema);
 
 // Message functions
 
-async function insertMessage(id, data, sessionId) {
+async function insertMessage(sessionId, data) {
   if (!(data.message && data.date)) {
     return { success: false, err: -3 };
   }
-  data._id = id;
   try {
     data.username = await authenticateUser(sessionId);
     if (!data.username) return { success: false, err: -6 };
 
     await Message.create(data);
     return { success: true, err: null };
+  } catch (err) {
+    return { success: false, err: -100 };
+  }
+}
+
+async function deleteMessage(data) {
+  try {
+    await Message.deleteOne({
+      _id: data.id,
+      username: await authenticateUser(data.sessionId)
+    });
   } catch (err) {
     return { success: false, err: -100 };
   }
@@ -147,4 +156,4 @@ async function getUserBySessionId(sessionId) {
   }
 }
 
-module.exports = { insertMessage, getMessages, getLastId, createUser, login, logout, getUserBySessionId };
+module.exports = { insertMessage, deleteMessage, getMessages, getLastId, createUser, login, logout, getUserBySessionId };
